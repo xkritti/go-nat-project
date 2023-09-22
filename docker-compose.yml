@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+#   service:
+#     container_name: go-fiber-services
+#     working_dir: /build
+#     build:
+#       context: .
+#       dockerfile: ./Dockerfile
+#     ports:
+#       - "3000:3000"
+#     # depends_on:
+#     #   - postgres
+#     #   - redis
+#     volumes:
+#       - ${PWD:-./}:/build
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microservices
+    volumes:
+      - './microservices:/app'
+    working_dir: /app
+    ports:
+      - 3000:3000
+    # links:
+    #   - database
+    #   - rabbitmq
