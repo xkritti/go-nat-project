@@ -1,4 +1,4 @@
-module go-fiber-nat-project
+module go-nat-project
 
 go 1.21.1
 
