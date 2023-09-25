@@ -5,6 +5,8 @@
 *.prof
 *.out
 
+.env
+
 vendor/
 tmp/
 
