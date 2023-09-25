@@ -11,7 +11,7 @@ services:
     environment:
       - PORT=${PORT} 
     ports:
-      - 3000:${PORT}
+      - 443:${PORT}
     env_file:
       - .env
     # links:
