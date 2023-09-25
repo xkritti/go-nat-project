@@ -25,3 +25,7 @@ func GetAllUser(c *fiber.Ctx) error {
 		})
 	}
 }
+
+func GetUser(c *fiber.Ctx) error {
+	return c.SendString("Users, World 👋!")
+}

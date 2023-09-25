@@ -15,8 +15,9 @@ jobs:
       PG_PASSWORD: ${{secrets.PG_PASSWORD}}
       PG_DATABASE: ${{secrets.PG_DATABASE}}
       SYNCHRONIZE: ${{secrets.SYNCHRONIZE}}
+    
     steps:
-      - uses: actions/checkout@develop
+      - uses: actions/checkout@main
 
       - name: Create .env
         run: |
