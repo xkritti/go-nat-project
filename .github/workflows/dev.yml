@@ -33,6 +33,9 @@ jobs:
           PG_DATABASE=$PG_DATABASE
           SYNCHRONIZE=$SYNCHRONIZE
           EOF
+          
+      - name: Show .env Contents
+        run: cat .env
 
       - name: Run Docker Compose Dev
         run: docker-compose -f docker-compose.dev.yml up -d --build
