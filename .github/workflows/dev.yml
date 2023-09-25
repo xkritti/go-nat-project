@@ -32,7 +32,7 @@ jobs:
           EOF
 
       - name: Run Docker Compose Dev
-        run: docker compose -f docker-compose.dev.yml up -d --build
+        run: docker-compose -f docker-compose.dev.yml up -d --build
 
       - name: Clear Unused Containers
         run: docker system prune -f
