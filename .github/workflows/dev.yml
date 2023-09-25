@@ -35,11 +35,11 @@ jobs:
           SYNCHRONIZE=$SYNCHRONIZE
           EOF
           
-      - name: Show .env Contents
-        run: cat .env
+      # - name: Show .env Contents
+      #   run: cat .env
 
       - name: Run Docker Compose Dev
-        run: sudo docker-compose -f docker-compose.dev.yml up -d --build
+        run: docker compose -f docker-compose.dev.yml up -d --build
 
       - name: Clear Unused Containers
-        run: sudo docker system prune -f
+        run: docker system prune -f
