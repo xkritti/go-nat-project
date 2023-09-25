@@ -1,0 +1,37 @@
+name: DEPLOY_DEV
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  Deploy:
+    runs-on: [self-hosted]
+    env:
+      PORT: ${{secrets.PORT}}
+      PG_HOST: ${{secrets.PG_HOST}}
+      PG_PORT: ${{secrets.PG_PORT}}
+      PG_USERNAME: ${{secrets.PG_USERNAME}}
+      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
+      PG_DATABASE: ${{secrets.PG_DATABASE}}
+      SYNCHRONIZE: ${{secrets.SYNCHRONIZE}}
+    steps:
+      - uses: actions/checkout@develop
+
+      - name: Create .env
+        run: |
+          cat << EOF > env/.env
+          PORT=$PORT
+          PG_HOST=$PG_HOST
+          PG_PORT=$PG_PORT
+          PG_USERNAME=$PG_USERNAME
+          PG_PASSWORD=$PG_PASSWORD
+          PG_DATABASE=$PG_DATABASE
+          SYNCHRONIZE=$SYNCHRONIZE
+          EOF
+
+      - name: Run Docker Compose Dev
+        run: docker compose -f docker-compose.dev.yml up -d --build
+
+      - name: Clear Unused Containers
+        run: docker system prune -f
