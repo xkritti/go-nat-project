@@ -3,15 +3,15 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: go-nat-prod
+      dockerfile: Dockerfile.dev
+    container_name: go-nat-dev
     volumes:
       - './:/app'
     working_dir: /app
     environment:
       - PORT=${PORT} 
     ports:
-      - 80:${PORT}
+      - 3000:${PORT}
     env_file:
       - .env
     # links:
