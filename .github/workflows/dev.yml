@@ -1,12 +1,14 @@
-name: DEPLOY_DEV
+name: CI/CD for Develop Branch
 
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
 
 jobs:
   Deploy:
     runs-on: [self-hosted]
+    
     env:
       PORT: ${{secrets.PORT}}
       PG_HOST: ${{secrets.PG_HOST}}
@@ -17,7 +19,8 @@ jobs:
       SYNCHRONIZE: ${{secrets.SYNCHRONIZE}}
     
     steps:
-      - uses: actions/checkout@main
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Create .env
         run: |
