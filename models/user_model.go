@@ -13,7 +13,7 @@ type User struct {
 	Lastname  string    `json:"lastname"`
 	Email     string    `json:"email" gorm:"unique"`
 	Phone     string    `json:"phone" goem:"unique"`
-	// Role      string    `json:"role"`
+	Role      string    `json:"role"`
 }
 
 type Users struct {
