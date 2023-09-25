@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"go-nat-project/config"
 	"go-nat-project/database"
 	_ "go-nat-project/docs"
 	router "go-nat-project/rounter"
@@ -31,5 +30,5 @@ func main() {
 			return c.SendStatus(404) // => 404 "Not Found"
 		})
 
-	log.Fatal(app.Listen(":" + config.Config("PORT")))
+	log.Fatal(app.Listen(":" + "4000"))
 }
