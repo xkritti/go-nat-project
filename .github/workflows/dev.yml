@@ -10,13 +10,13 @@ jobs:
     runs-on: [self-hosted]
     
     env:
-      PORT: ${{secrets.PORT}}
-      PG_HOST: ${{secrets.PG_HOST}}
-      PG_PORT: ${{secrets.PG_PORT}}
-      PG_USERNAME: ${{secrets.PG_USERNAME}}
-      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
-      PG_DATABASE: ${{secrets.PG_DATABASE}}
-      SYNCHRONIZE: ${{secrets.SYNCHRONIZE}}
+      PORT: ${{env.PORT}}
+      PG_HOST: ${{env.PG_HOST}}
+      PG_PORT: ${{env.PG_PORT}}
+      PG_USERNAME: ${{env.PG_USERNAME}}
+      PG_PASSWORD: ${{env.PG_PASSWORD}}
+      PG_DATABASE: ${{env.PG_DATABASE}}
+      SYNCHRONIZE: ${{env.SYNCHRONIZE}}
     
     steps:
       - name: Checkout code
