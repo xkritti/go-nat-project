@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"go-nat-project/config"
 	"go-nat-project/database"
 	_ "go-nat-project/docs"
 	router "go-nat-project/rounter"
@@ -12,6 +13,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 )
+
+// @title Swagger Example APIS
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host petstore.swagger.io
+// @BasePath /v2
 
 func main() {
 
@@ -30,5 +46,5 @@ func main() {
 			return c.SendStatus(404) // => 404 "Not Found"
 		})
 
-	log.Fatal(app.Listen(":" + "4000"))
+	log.Fatal(app.Listen(":" + config.Config("PORT")))
 }

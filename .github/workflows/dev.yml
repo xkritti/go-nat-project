@@ -12,27 +12,27 @@ jobs:
     
     env:
       PORT: ${{secrets.PORT}}
-      PG_HOST: ${{secrets.PG_HOST}}
-      PG_PORT: ${{secrets.PG_PORT}}
-      PG_USERNAME: ${{secrets.PG_USERNAME}}
-      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
-      PG_DATABASE: ${{secrets.PG_DATABASE}}
-      SYNCHRONIZE: ${{secrets.SYNCHRONIZE}}
+      DB_HOST: ${{secrets.DB_HOST}}
+      DB_PORT: ${{secrets.DB_PORT}}
+      DB_USERNAME: ${{secrets.DB_USERNAME}}
+      DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+      DB_DATABASE: ${{secrets.DB_DATABASE}}
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Create .env
         run: |
           cat << EOF > .env
           PORT=$PORT
-          PG_HOST=$PG_HOST
-          PG_PORT=$PG_PORT
-          PG_USERNAME=$PG_USERNAME
-          PG_PASSWORD=$PG_PASSWORD
-          PG_DATABASE=$PG_DATABASE
-          SYNCHRONIZE=$SYNCHRONIZE
+          DB_HOST=$DB_HOST
+          DB_PORT=$DB_PORT
+          DB_USERNAME=$DB_USERNAME
+          DB_PASSWORD=$DB_PASSWORD
+          DB_DATABASE=$DB_DATABASE
           EOF
           
       # - name: Show .env Contents

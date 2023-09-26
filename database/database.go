@@ -30,7 +30,7 @@ func Connect() {
 	if err != nil {
 		log.Fatal("Error parsing port (str -> int)")
 	}
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai", config.Config("DB_HOST"), config.Config("DB_USER"), config.Config("DB_PASSWORD"), config.Config("DB_NAME"), port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai", config.Config("DB_HOST"), config.Config("DB_USERNAME"), config.Config("DB_PASSWORD"), config.Config("DB_DATABASE"), port)
 	log.Println("Database connection string: ", dsn)
 	// postgres connection
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
