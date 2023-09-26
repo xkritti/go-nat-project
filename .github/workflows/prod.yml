@@ -1,0 +1,40 @@
+name: CI/CD for Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: [self-hosted]
+    environment: prod
+    
+    env:
+      PORT: ${{secrets.PORT}}
+      DB_HOST: ${{secrets.DB_HOST}}
+      DB_PORT: ${{secrets.DB_PORT}}
+      DB_USERNAME: ${{secrets.DB_USERNAME}}
+      DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+      DB_DATABASE: ${{secrets.DB_DATABASE}}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env
+        run: |
+          cat << EOF > .env
+          PORT=$PORT
+          DB_HOST=$DB_HOST
+          DB_PORT=$DB_PORT
+          DB_USERNAME=$DB_USERNAME
+          DB_PASSWORD=$DB_PASSWORD
+          DB_DATABASE=$DB_DATABASE
+          EOF
+
+      - name: Run Docker Compose Dev
+        run: docker compose up -d --build
+
+      - name: Clear Unused Containers
+        run: docker system prune -f

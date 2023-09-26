@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"go-nat-project/config"
-	user_models "go-nat-project/models"
+	models "go-nat-project/models"
 
 	"log"
 	"os"
@@ -48,9 +48,13 @@ func Connect() {
 
 	log.Println("Database migration started")
 
-	var models = []interface{}{&user_models.User{}}
+	var models = []interface{}{&models.User{}}
 
 	db.AutoMigrate(models...)
 
 	DB = Database{Db: db}
+
+	defer disconnect(){
+		// TODO : close database connection 
+	}
 }
