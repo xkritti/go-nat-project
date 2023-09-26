@@ -1,28 +1,31 @@
 package user_handler
 
 import (
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"go-nat-project/database"
+	"go-nat-project/models"
 	user_models "go-nat-project/models"
+	"go-nat-project/utils"
+
 	"io"
 	"os"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"
+	"gorm.io/gorm"
 )
 
 // can get all user and filter by year and level_type and major_type
+
 func GetAllUser(c *fiber.Ctx) error {
 	db := database.DB.Db
 	var users []user_models.Users
 	db.Find(&users)
 	if len(users) == 0 {
-		return c.Status(404).JSON(fiber.Map{
-			"status":  "error",
-			"message": "No user found!",
+		return c.JSON(models.CommonResponse{
+			Code: 2000,
+			Data: "OK",
 		})
 	} else {
 		return c.Status(200).JSON(fiber.Map{
@@ -34,7 +37,36 @@ func GetAllUser(c *fiber.Ctx) error {
 }
 
 func GetUser(c *fiber.Ctx) error {
-	return c.SendString("Users, World 👋!")
+	db := database.DB.Db
+
+	payload := struct {
+		Cid string `json:"cid"`
+	}{}
+
+	err := c.BodyParser(&payload)
+
+	if err != nil {
+		return err
+	}
+
+	result := user_models.User{}
+	err = db.First(&result, "cid = ?", utils.GetSha256Enc(payload.Cid)).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return utils.SendCommonError(c, models.CommonError{
+				Code: 2001,
+				ErrorData: models.ApiError{
+					ErrorTitle:   "Not Found",
+					ErrorMessage: "User Not Found",
+				},
+			})
+		} else {
+			return err
+		}
+	}
+
+	return utils.SendSuccess(c, result)
 }
 
 func UploadUserExcel(c *fiber.Ctx) error {
@@ -76,7 +108,6 @@ func UploadUserExcel(c *fiber.Ctx) error {
 	var user user_models.User
 
 	for i := 2; i < len(rows); i++ {
-		h := sha256.New()
 
 		cell := fmt.Sprintf("F%d", i)
 		cid, err := excelResult.GetCellValue(sheetName, cell)
@@ -85,13 +116,7 @@ func UploadUserExcel(c *fiber.Ctx) error {
 			return err
 		}
 
-		h.Write([]byte(cid))
-
-		bs := h.Sum(nil)
-
-		hashedCid := fmt.Sprintf("%x", bs)
-
-		user.Cid = hashedCid
+		user.Cid = utils.GetSha256Enc(cid)
 
 		cell = fmt.Sprintf("C%d", i)
 		prefix, _ := excelResult.GetCellValue(sheetName, cell)
@@ -129,14 +154,14 @@ func UploadUserExcel(c *fiber.Ctx) error {
 		level, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Level = level
 
-		user.CreatedAt = time.Now()
-		user.UpdatedAt = time.Now()
-
 		result := db.Create(&user)
 
 		fmt.Println(result)
 
 	}
 
-	return nil
+	return c.JSON(models.CommonResponse{
+		Code: 1000,
+		Data: "Upload Complete",
+	})
 }
