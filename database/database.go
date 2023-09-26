@@ -54,7 +54,8 @@ func Connect() {
 
 	DB = Database{Db: db}
 
-	defer disconnect(){
-		// TODO : close database connection 
+	defer disconnect(db *gorm.DB){
+		// TODO : close database connection
+		db.Close()
 	}
 }
