@@ -1,19 +1,26 @@
 package user_models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id" gorm:"primary_key, type:uuid; default:uuid_generate_v4()"`
-	Username  string    `json:"username" gore:"unique"`
-	Password  string    `json:"password"`
-	Firstname string    `json:"firstname"`
-	Lastname  string    `json:"lastname"`
-	Email     string    `json:"email" gorm:"unique"`
-	Phone     string    `json:"phone" goem:"unique"`
-	Role      string    `json:"role"`
+	ID              uuid.UUID `json:"id" gorm:"primary_key, type:uuid; default:uuid_generate_v4()"`
+	Cid             string    `json:"cid" gorm:"unique"`
+	Prefix          string    `json:"prefix"`
+	Name            string    `json:"name"`
+	LevelType       string    `json:"level_type"`
+	CompetitionType string    `json:"competition_type"`
+	ExamLocation    string    `json:"exam_location"`
+	School          string    `json:"school"`
+	Province        string    `json:"province"`
+	Sector          string    `json:"sector"`
+	Level           string    `json:"level"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"create_at"`
 }
 
 type Users struct {
