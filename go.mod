@@ -1,6 +1,6 @@
 module go-nat-project
 
-go 1.23
+go 1.21.1
 
 require (
 	github.com/gofiber/swagger v0.1.13
