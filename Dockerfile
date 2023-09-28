@@ -18,8 +18,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/app .
 ############################
 FROM alpine:latest
 
-# COPY .env .env
-# Import from builder.
+COPY .env .env
+
+# Import from builder.s
 COPY --from=production /app/app /go/bin/app-prod
 
 # EXPOSE 3000
