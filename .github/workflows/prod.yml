@@ -9,7 +9,7 @@ jobs:
   Deploy:
     runs-on: [self-hosted]
     environment: prod
-    
+
     env:
       PORT: ${{secrets.PORT}}
       DB_HOST: ${{secrets.DB_HOST}}
@@ -17,7 +17,7 @@ jobs:
       DB_USERNAME: ${{secrets.DB_USERNAME}}
       DB_PASSWORD: ${{secrets.DB_PASSWORD}}
       DB_DATABASE: ${{secrets.DB_DATABASE}}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +34,9 @@ jobs:
           EOF
 
       - name: Run Docker Compose Dev
-        run: docker compose up -d --build
+        # because we are using 2 Dockerfiles, we need to specify the docker-compose.yml file
+        # by default docker compose up , i should be use the default docker-compose.yml file
+        run: docker compose -f docker-compose.yml up -d --build
 
       - name: Clear Unused Containers
         run: docker system prune -f

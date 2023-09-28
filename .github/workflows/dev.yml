@@ -39,7 +39,9 @@ jobs:
       #   run: cat .env
 
       - name: Run Docker Compose Dev
-        run: docker compose -f docker-compose.dev.yml up -d --build
+      # because we are using 2 Dockerfiles, we need to specify the docker-compose.yml file
+      # by default docker compose up , i should be use the default docker-compose.yml file
+        run: docker compose -f docker-compose.yml up -d --build
 
       - name: Clear Unused Containers
         run: docker system prune -f
