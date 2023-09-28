@@ -5,9 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: go-nat-prod
-    volumes:
-      - './:/app'
-    working_dir: /app
+    # volumes:
+    #   - './:/app'
+    # working_dir: /app
     environment:
       - PORT=${PORT} 
     ports:
