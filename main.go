@@ -1,12 +1,11 @@
 package main
 
 import (
-	"log"
-
 	"go-nat-project/config"
 	"go-nat-project/database"
 	_ "go-nat-project/docs"
-	router "go-nat-project/rounter"
+	router "go-nat-project/router"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -30,7 +29,6 @@ import (
 // @BasePath /v2
 
 func main() {
-
 	database.Connect()
 
 	app := fiber.New()
@@ -46,5 +44,6 @@ func main() {
 			return c.SendStatus(404) // => 404 "Not Found"
 		})
 
-	log.Fatal(app.Listen(":" + config.Config("PORT")))
+	port := config.Config().Port
+	log.Fatal(app.Listen(":" + port))
 }

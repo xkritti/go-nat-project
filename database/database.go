@@ -21,7 +21,8 @@ type Database struct {
 var DB = Database{}
 
 func Connect() {
-	p := config.Config("DB_PORT")
+	env := config.Config()
+	p := env.DbPort
 
 	port, err := strconv.ParseInt(p, 10, 32)
 
@@ -30,7 +31,7 @@ func Connect() {
 	if err != nil {
 		log.Fatal("Error parsing port (str -> int)")
 	}
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai", config.Config("DB_HOST"), config.Config("DB_USERNAME"), config.Config("DB_PASSWORD"), config.Config("DB_DATABASE"), port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai", env.DbHost, env.DbUser, env.DbPass, env.DbName, port)
 	log.Println("Database connection string: ", dsn)
 	// postgres connection
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -54,8 +55,8 @@ func Connect() {
 
 	DB = Database{Db: db}
 
-	defer disconnect(db *gorm.DB){
-		// TODO : close database connection
-		db.Close()
-	}
+	// defer disconnect(db *gorm.DB){
+	// 	// TODO : close database connection
+	// 	db.Close()
+	// }
 }
