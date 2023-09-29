@@ -11,7 +11,6 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 )
 
@@ -96,63 +95,37 @@ func UploadUserExcel(c *fiber.Ctx) error {
 
 	fmt.Println("Upload Excel")
 
-	excelResult, err := excelize.OpenFile(file.Filename)
+	excelResult, rows, sheetName, err := utils.ExcelReader(file.Filename, 0)
 
 	if err != nil {
 		return err
 	}
 
-	sheetName := excelResult.GetSheetName(0)
-	rows, err := excelResult.GetRows(sheetName)
 	var user models.User
 
-	for i := 2; i < len(rows); i++ {
+	for i := 2; i < rows; i++ {
 
-		cell := fmt.Sprintf("F%d", i)
-		cid, err := excelResult.GetCellValue(sheetName, cell)
-
-		if err != nil {
-			return err
-		}
+		cid, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("F%d", i))
+		prefix, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("C%d", i))
+		name, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("A%d", i))
+		levelType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
+		competitionType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("J%d", i))
+		examLocation, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("K%d", i))
+		school, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("L%d", i))
+		province, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("M%d", i))
+		sector, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("O%d", i))
+		level, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
 
 		user.Cid = utils.GetSha256Enc(cid)
-
-		cell = fmt.Sprintf("C%d", i)
-		prefix, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Prefix = prefix
-
-		cell = fmt.Sprintf("A%d", i)
-		name, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Name = name
-
-		cell = fmt.Sprintf("H%d", i)
-		levelType, _ := excelResult.GetCellValue(sheetName, cell)
 		user.LevelType = levelType
-
-		cell = fmt.Sprintf("J%d", i)
-		competitionType, _ := excelResult.GetCellValue(sheetName, cell)
 		user.CompetitionType = competitionType
-
-		cell = fmt.Sprintf("K%d", i)
-		examLocation, _ := excelResult.GetCellValue(sheetName, cell)
 		user.ExamLocation = examLocation
-
-		cell = fmt.Sprintf("L%d", i)
-		school, _ := excelResult.GetCellValue(sheetName, cell)
 		user.School = school
-
-		cell = fmt.Sprintf("M%d", i)
-		province, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Province = province
-
-		cell = fmt.Sprintf("O%d", i)
-		sector, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Sector = sector
-
-		cell = fmt.Sprintf("H%d", i)
-		level, _ := excelResult.GetCellValue(sheetName, cell)
 		user.Level = level
-
 		result := db.Create(&user)
 
 		fmt.Println(result)
