@@ -7,9 +7,6 @@ import (
 	"go-nat-project/models"
 	"go-nat-project/utils"
 
-	"io"
-	"os"
-
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -68,44 +65,19 @@ func GetUser(c *fiber.Ctx) error {
 }
 
 func UploadUserExcel(c *fiber.Ctx) error {
-	file, err := c.FormFile("file")
+	filename, err := utils.UploadFileReader(c)
+	excelResult, sheetName, rows, err := utils.ExcelReader(filename, 0)
+
+	if err != nil {
+		return err
+	}
+
 	db := database.DB.Db
-
-	if err != nil {
-		return errors.New("Uploading Failed!")
-	}
-
-	src, err := file.Open()
-
-	if err != nil {
-		return errors.New("Source Invalid")
-	}
-
-	defer src.Close()
-
-	dest, err := os.Create(file.Filename)
-
-	defer dest.Close()
-
-	_, err = io.Copy(dest, src)
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Upload Excel")
-
-	excelResult, rows, sheetName, err := utils.ExcelReader(file.Filename, 0)
-
-	if err != nil {
-		return err
-	}
-
 	var user models.User
-
+	rows = 10
 	for i := 2; i < rows; i++ {
-
 		cid, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("F%d", i))
+		fmt.Println(cid)
 		prefix, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("C%d", i))
 		name, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("A%d", i))
 		levelType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
@@ -131,6 +103,8 @@ func UploadUserExcel(c *fiber.Ctx) error {
 		fmt.Println(result)
 
 	}
+
+	utils.DeleteFile(filename)
 
 	return c.JSON(models.CommonResponse{
 		Code: 1000,
