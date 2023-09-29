@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go-nat-project/database"
 	"go-nat-project/models"
-	user_models "go-nat-project/models"
 	"go-nat-project/utils"
 
 	"io"
@@ -20,7 +19,7 @@ import (
 
 func GetAllUser(c *fiber.Ctx) error {
 	db := database.DB.Db
-	var users []user_models.Users
+	var users []models.Users
 	db.Find(&users)
 	if len(users) == 0 {
 		return c.JSON(models.CommonResponse{
@@ -49,7 +48,7 @@ func GetUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	result := user_models.User{}
+	result := models.User{}
 	err = db.First(&result, "cid = ?", utils.GetSha256Enc(payload.Cid)).Error
 
 	if err != nil {
@@ -105,7 +104,7 @@ func UploadUserExcel(c *fiber.Ctx) error {
 
 	sheetName := excelResult.GetSheetName(0)
 	rows, err := excelResult.GetRows(sheetName)
-	var user user_models.User
+	var user models.User
 
 	for i := 2; i < len(rows); i++ {
 

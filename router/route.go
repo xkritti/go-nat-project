@@ -1,7 +1,7 @@
 package router
 
 import (
-	user_handler "go-nat-project/handler"
+	"go-nat-project/handler"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -12,9 +12,9 @@ func SetupRoutes(app *fiber.App) {
 		return c.SendString("Hello, World 👋!")
 	})
 	user_api := api.Group("/user")
-	user_api.Get("/auth", user_handler.GetUser)
+	user_api.Get("/auth", handler.GetUser)
 	// user_api.Get("/get_user", user_handler.GetUser)
-	user_api.Post("/upload_user", user_handler.UploadUserExcel)
+	user_api.Post("/upload_user", handler.UploadUserExcel)
 	// auth_api := api.Group("/auth")
 	// score_api := api.Group("/score")
 	// upload_api := api.Group("/upload")
