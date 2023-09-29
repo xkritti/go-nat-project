@@ -21,7 +21,7 @@ type Database struct {
 var DB = Database{}
 
 func Connect() {
-	env := config.Config()
+	env := config.ENV
 	p := env.DbPort
 
 	port, err := strconv.ParseInt(p, 10, 32)

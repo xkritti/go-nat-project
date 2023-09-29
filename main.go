@@ -29,6 +29,7 @@ import (
 // @BasePath /v2
 
 func main() {
+	config.Config()
 	database.Connect()
 
 	app := fiber.New()
@@ -44,6 +45,6 @@ func main() {
 			return c.SendStatus(404) // => 404 "Not Found"
 		})
 
-	port := config.Config().Port
+	port := config.ENV.Port
 	log.Fatal(app.Listen(":" + port))
 }

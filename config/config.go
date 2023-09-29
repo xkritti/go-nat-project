@@ -2,13 +2,12 @@ package config
 
 import (
 	"fmt"
-	// "os"
 
 	"github.com/joho/godotenv"
 	"github.com/mitchellh/mapstructure"
 )
 
-type ENV struct {
+type Environment struct {
 	Port   string `mapstructure:"PORT"`
 	DbHost string `mapstructure:"DB_HOST"`
 	DbPort string `mapstructure:"DB_PORT"`
@@ -17,20 +16,17 @@ type ENV struct {
 	DbName string `mapstructure:"DB_DATABASE"`
 }
 
-var env = ENV{}
+var ENV Environment = Environment{}
 
-func Config() ENV {
-
+func Config() Environment {
 	envMap, err := godotenv.Read(".env")
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
 
-	err = mapstructure.Decode(envMap, &env)
+	err = mapstructure.Decode(envMap, &ENV)
 	if err != nil {
 		fmt.Printf("Error decoding map: %v\n", err)
 	}
-
-	return *&env
-
+	return *&ENV
 }
