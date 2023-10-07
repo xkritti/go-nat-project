@@ -49,7 +49,7 @@ func Connect() {
 
 	log.Println("Database migration started")
 
-	var models = []interface{}{&models.User{}}
+	var models = []interface{}{&models.User{}, &models.Competitor{}}
 
 	db.AutoMigrate(models...)
 

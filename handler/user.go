@@ -8,6 +8,7 @@ import (
 	"go-nat-project/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 )
 
@@ -44,7 +45,7 @@ func GetUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	result := models.User{}
+	result := models.Competitor{}
 	err = db.First(&result, "cid = ?", utils.GetSha256Enc(payload.Cid)).Error
 
 	if err != nil {
@@ -66,41 +67,53 @@ func GetUser(c *fiber.Ctx) error {
 
 func UploadUserExcel(c *fiber.Ctx) error {
 	filename, err := utils.UploadFileReader(c)
-	excelResult, sheetName, rows, err := utils.ExcelReader(filename, 0)
-
+	excelResult, sheetName, _, err := utils.ExcelReader(filename, 0)
 	if err != nil {
-		return err
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: "Upload Failed",
+		})
 	}
 
 	db := database.DB.Db
-	var user models.User
-	rows = 10
-	for i := 2; i < rows; i++ {
-		cid, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("F%d", i))
-		fmt.Println(cid)
-		prefix, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("C%d", i))
-		name, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("A%d", i))
-		levelType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
-		competitionType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("J%d", i))
-		examLocation, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("K%d", i))
-		school, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("L%d", i))
-		province, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("M%d", i))
-		sector, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("O%d", i))
-		level, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
+	var competitor models.Competitor
+	rows, err := excelResult.GetRows("Sheet1")
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: "Upload Failed",
+		})
+	}
+	for i := 2; i < len(rows); i++ {
+		examType, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("A%d", i))
+		name, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("B%d", i))
+		cid, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("C%d", i), excelize.Options{RawCellValue: true})
+		fmt.Printf("%d | RAW CID : %s", i, cid)
+		levelRange, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("D%d", i))
+		level, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("E%d", i))
+		province, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("F%d", i))
+		region, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("G%d", i))
+		school, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("H%d", i))
+		examLocation, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("I%d", i))
+		competitor.ExamType = examType
+		competitor.Name = name
+		competitor.Cid = utils.GetSha256Enc(cid)
+		competitor.LevelRange = levelRange
+		competitor.Level = level
+		competitor.Province = province
+		competitor.Region = region
+		competitor.School = school
+		competitor.ExamLocation = examLocation
+		fmt.Printf(" | %s | %s | %s | %s | %s | %s | %s | %s | %s  \n", examType, name, cid, levelRange, level, province, region, school, examLocation)
+		db.Create(&competitor)
 
-		user.Cid = utils.GetSha256Enc(cid)
-		user.Prefix = prefix
-		user.Name = name
-		user.LevelType = levelType
-		user.CompetitionType = competitionType
-		user.ExamLocation = examLocation
-		user.School = school
-		user.Province = province
-		user.Sector = sector
-		user.Level = level
-		result := db.Create(&user)
+		if err != nil {
+			return c.JSON(models.CommonResponse{
+				Code: 1001,
+				Data: "Upload Failed",
+			})
 
-		fmt.Println(result)
+		}
 
 	}
 
