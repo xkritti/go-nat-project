@@ -53,8 +53,8 @@ func GetUser(c *fiber.Ctx) error {
 			return utils.SendCommonError(c, models.CommonError{
 				Code: 2001,
 				ErrorData: models.ApiError{
-					ErrorTitle:   "Not Found",
-					ErrorMessage: "User Not Found",
+					ErrorTitle:   "ไม่สามารถดำเนินการได้",
+					ErrorMessage: "ไม่พบรายชื่อในระบบ",
 				},
 			})
 		} else {
