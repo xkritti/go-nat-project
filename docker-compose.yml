@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   api:
-  restart: unless-stopped
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
