@@ -87,3 +87,78 @@ func DeleteFile(filename string) error {
 	}
 	return nil
 }
+
+type ColumnLabelType string
+
+const (
+	ID           string = "id"
+	ExamType     string = "exam_type"
+	Name         string = "name"
+	Cid          string = "cid"
+	NewCid       string = "new_cid"
+	LevelRange   string = "level_range"
+	Level        string = "level"
+	Province     string = "province"
+	Region       string = "region"
+	School       string = "school"
+	ExamLocation string = "exam_location"
+)
+
+type ColumnReader struct {
+	Columns           map[string]string
+	DBColumnsSelected []string
+}
+
+var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func NewColumnReader(headerRow []string) *ColumnReader {
+	fmt.Println(headerRow)
+	columns := make(map[string]string)
+	dbColumn := []string{}
+	for i, v := range headerRow {
+		switch v {
+		case ID:
+			columns[ID] = string(alphabet[i])
+			dbColumn = append(dbColumn, ID)
+		case ExamType:
+			columns[ExamType] = string(alphabet[i])
+			dbColumn = append(dbColumn, ExamType)
+		case Name:
+			columns[Name] = string(alphabet[i])
+			dbColumn = append(dbColumn, Name)
+		case Cid:
+			columns[Cid] = string(alphabet[i])
+			dbColumn = append(dbColumn, Cid)
+		case NewCid:
+			columns[NewCid] = string(alphabet[i])
+			dbColumn = append(dbColumn, Cid)
+		case LevelRange:
+			columns[LevelRange] = string(alphabet[i])
+			dbColumn = append(dbColumn, LevelRange)
+		case Level:
+			columns[Level] = string(alphabet[i])
+			dbColumn = append(dbColumn, Level)
+		case Province:
+			columns[Province] = string(alphabet[i])
+			dbColumn = append(dbColumn, Province)
+		case Region:
+			columns[Region] = string(alphabet[i])
+			dbColumn = append(dbColumn, Region)
+		case School:
+			columns[School] = string(alphabet[i])
+			dbColumn = append(dbColumn, School)
+		case ExamLocation:
+			columns[ExamLocation] = string(alphabet[i])
+			dbColumn = append(dbColumn, ExamLocation)
+		}
+	}
+	fmt.Println(columns)
+	return &ColumnReader{
+		Columns:           columns,
+		DBColumnsSelected: dbColumn,
+	}
+}
+
+func (c *ColumnReader) GetColumnId(columnName string) string {
+	return c.Columns[columnName]
+}
