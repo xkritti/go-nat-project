@@ -7,6 +7,7 @@ import (
 	"go-nat-project/models"
 	"go-nat-project/utils"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -119,7 +120,7 @@ func UploadUserExcel(c *fiber.Ctx) error {
 		competitorList = append(competitorList, &models.Competitor{
 			ID:           uuid.New().String(),
 			Name:         name,
-			Cid:          utils.GetSha256Enc(cid),
+			Cid:          utils.GetSha256Enc(strings.TrimSpace(cid)),
 			ExamType:     examType,
 			LevelRange:   levelRange,
 			Level:        level,
