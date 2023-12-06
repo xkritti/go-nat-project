@@ -31,7 +31,7 @@ func Connect() {
 	if err != nil {
 		log.Fatal("Error parsing port (str -> int)")
 	}
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=require TimeZone=Asia/Shanghai", env.DbHost, env.DbUser, env.DbPass, env.DbName, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Shanghai", env.DbHost, env.DbUser, env.DbPass, env.DbName, port)
 	log.Println("Database connection string: ", dsn)
 	// postgres connection
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
@@ -49,7 +49,10 @@ func Connect() {
 
 	log.Println("Database migration started")
 
-	var models = []interface{}{&models.User{}, &models.Competitor{}}
+	var models = []interface{}{
+		&models.Competitor{},
+		&models.EngScore{},
+	}
 
 	db.AutoMigrate(models...)
 

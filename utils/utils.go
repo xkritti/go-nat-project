@@ -102,6 +102,12 @@ const (
 	Region       string = "region"
 	School       string = "school"
 	ExamLocation string = "exam_location"
+	TotalScore   string = "total_score"
+
+	EngPtExpression string = "expression"
+	EngPtReading    string = "reading"
+	EngPtStructure  string = "structure"
+	EngPtVocabulary string = "vocabulary"
 )
 
 type ColumnReader struct {
@@ -150,6 +156,21 @@ func NewColumnReader(headerRow []string) *ColumnReader {
 		case ExamLocation:
 			columns[ExamLocation] = string(alphabet[i])
 			dbColumn = append(dbColumn, ExamLocation)
+		case TotalScore:
+			columns[TotalScore] = string(alphabet[i])
+			dbColumn = append(dbColumn, TotalScore)
+		case EngPtExpression:
+			columns[EngPtExpression] = string(alphabet[i])
+			dbColumn = append(dbColumn, EngPtExpression)
+		case EngPtReading:
+			columns[EngPtReading] = string(alphabet[i])
+			dbColumn = append(dbColumn, EngPtReading)
+		case EngPtStructure:
+			columns[EngPtStructure] = string(alphabet[i])
+			dbColumn = append(dbColumn, EngPtStructure)
+		case EngPtVocabulary:
+			columns[EngPtVocabulary] = string(alphabet[i])
+			dbColumn = append(dbColumn, EngPtVocabulary)
 		}
 	}
 	fmt.Println(columns)
