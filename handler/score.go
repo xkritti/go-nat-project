@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"fmt"
 	"go-nat-project/database"
 	"go-nat-project/models"
@@ -57,7 +56,7 @@ func UploadScore(c *fiber.Ctx) error {
 
 	db := database.DB.Db
 
-	errRowNumberList := []int{}
+	errRowNumberList := []string{}
 	rows, err := excelResult.GetRows(sheetName)
 	if err != nil {
 		return c.JSON(models.CommonResponse{
@@ -74,7 +73,7 @@ func UploadScore(c *fiber.Ctx) error {
 			userInfo, errRow, err := getUserInfo(excelResult, sheetName, colReader, i)
 			if err != nil {
 				slog.Error(err.Error())
-				errRowNumberList = append(errRowNumberList, errRow)
+				errRowNumberList = append(errRowNumberList, fmt.Sprintf("%v, with error %v", errRow, err.Error()))
 				continue
 			}
 
@@ -127,7 +126,7 @@ func UploadScore(c *fiber.Ctx) error {
 			Code: 1000,
 			Data: struct {
 				Message string
-				ErrList []int
+				ErrList []string
 			}{
 				Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(engScoreList), tx.RowsAffected),
 				ErrList: errRowNumberList,
@@ -142,7 +141,7 @@ func UploadScore(c *fiber.Ctx) error {
 			userInfo, errRow, err := getUserInfo(excelResult, sheetName, colReader, i)
 			if err != nil {
 				slog.Error(err.Error())
-				errRowNumberList = append(errRowNumberList, errRow)
+				errRowNumberList = append(errRowNumberList, fmt.Sprintf("%v, with error %v", errRow, err.Error()))
 				continue
 			}
 			scorePtLessonStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.SciPtLesson), i))
@@ -178,7 +177,7 @@ func UploadScore(c *fiber.Ctx) error {
 			Code: 1000,
 			Data: struct {
 				Message string
-				ErrList []int
+				ErrList []string
 			}{
 				Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(sciScoreList), tx.RowsAffected),
 				ErrList: errRowNumberList,
@@ -193,7 +192,7 @@ func UploadScore(c *fiber.Ctx) error {
 			userInfo, errRow, err := getUserInfo(excelResult, sheetName, colReader, i)
 			if err != nil {
 				slog.Error(err.Error())
-				errRowNumberList = append(errRowNumberList, errRow)
+				errRowNumberList = append(errRowNumberList, fmt.Sprintf("%v, with error %v", errRow, err.Error()))
 				continue
 			}
 			scorePtCalculateStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.MathPtCalculate), i))
@@ -237,7 +236,7 @@ func UploadScore(c *fiber.Ctx) error {
 			Code: 1000,
 			Data: struct {
 				Message string
-				ErrList []int
+				ErrList []string
 			}{
 				Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(mathScoreList), tx.RowsAffected),
 				ErrList: errRowNumberList,
@@ -626,6 +625,11 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 		slog.Error(err.Error())
 	}
 
+	strCid, err := utils.RemoveScientificNotationInString(strings.TrimSpace(cid))
+	if err != nil {
+		strCid = strings.TrimSpace(cid)
+	}
+
 	if cid == "" {
 		return nil, rowNumberOfError, fmt.Errorf("cid is empty")
 	}
@@ -635,7 +639,6 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 	if err != nil {
 		slog.Error(err.Error())
 		provinceRank = 0
-		// return nil, rowNumberOfError, err
 	}
 
 	regionRankStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.RegionRank), row))
@@ -643,7 +646,6 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 	if err != nil {
 		slog.Error(err.Error())
 		regionRank = 0
-		// return nil, rowNumberOfError, err
 	}
 
 	shortLevelRange, err := utils.GetShortLevelRange(levelRange)
@@ -652,7 +654,9 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 		return nil, rowNumberOfError, err
 	}
 
-	hashCid := utils.GetSha256Enc(strings.TrimSpace(cid))
+	fmt.Printf("| %v | %v | %v | %v | %v | %v | %v \n", name, cid, strCid, levelRange, province, region, examLocation)
+
+	hashCid := utils.GetSha256Enc(strings.TrimSpace(strCid))
 	userScore = &models.Score{
 		Name:         name,
 		HashCid:      hashCid,
@@ -679,8 +683,13 @@ func getUserInfoForUpdate(excelResult *excelize.File, sheetName string, colReade
 	region, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Region), row))
 	examLocation, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.ExamLocation), row))
 
+	strCid, err := utils.RemoveScientificNotationInString(strings.TrimSpace(cid))
+	if err != nil {
+		strCid = strings.TrimSpace(cid)
+	}
+
 	if cid == "" {
-		return nil, rowNumberOfError, errors.New("cid is empty")
+		return nil, rowNumberOfError, fmt.Errorf("cid is empty")
 	}
 
 	totalScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.TotalScore), row))
@@ -706,7 +715,7 @@ func getUserInfoForUpdate(excelResult *excelize.File, sheetName string, colReade
 		shortLevelRange = ""
 	}
 
-	hashCid := utils.GetSha256Enc(strings.TrimSpace(cid))
+	hashCid := utils.GetSha256Enc(strings.TrimSpace(strCid))
 	userScore = &models.Score{
 		Name:         name,
 		HashCid:      hashCid,

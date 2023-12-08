@@ -7,6 +7,7 @@ import (
 	"go-nat-project/models"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"
@@ -224,4 +225,14 @@ func GetShortLevelRange(levelRangeTH string) (string, error) {
 	default:
 		return "", errors.New("level range not found")
 	}
+}
+
+func RemoveScientificNotationInString(s string) (string, error) {
+	floatingPointNum, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return "", err
+	}
+	nonScientificNotation := strconv.FormatFloat(floatingPointNum, 'f', -1, 64)
+
+	return nonScientificNotation, nil
 }
