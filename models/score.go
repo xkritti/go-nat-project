@@ -3,27 +3,53 @@ package models
 import (
 	"time"
 
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
-type EngScore struct {
+type Score struct {
 	Name         string         `json:"name"`
 	HashCid      string         `json:"hash_cid" gorm:"unique"`
 	LevelRange   string         `json:"level_range"`
 	Province     string         `json:"province"`
 	Region       string         `json:"region"`
 	ExamLocation string         `json:"exam_location"`
-	ScorePerPart datatypes.JSON `json:"score_per_part"`
 	TotalScore   float64        `json:"total_score"`
+	ProvinceRank int            `json:"province_rank"`
+	RegionRank   int            `json:"region_rank"`
 	CreatedAt    time.Time      `json:"created_at"`
-	UpdateAt     time.Time      `json:"updated_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `json:"deleted_at"`
 }
 
 type EngScorePerPart struct {
-	Expression float64 `json:"expression"`
-	Reading    float64 `json:"reading"`
-	Structure  float64 `json:"structure"`
-	Vocabulary float64 `json:"vocabulary"`
+	ScorePtExpression float64 `json:"score_pt_expression"`
+	ScorePtReading    float64 `json:"score_pt_reading"`
+	ScorePtStructure  float64 `json:"score_pt_structure"`
+	ScorePtVocabulary float64 `json:"score_pt_vocabulary"`
+}
+
+type EngScore struct {
+	Score
+	EngScorePerPart
+}
+
+type SciScorePerPart struct {
+	ScorePtLessonSci  float64 `json:"score_pt_lesson_sci"`
+	ScorePtAppliedSci float64 `json:"score_pt_applied_sci"`
+}
+
+type SciScore struct {
+	Score
+	SciScorePerPart
+}
+
+type MathScorePerPart struct {
+	ScorePtCalculate   float64 `json:"score_pt_calculate"`
+	ScorePtProblemMath float64 `json:"score_pt_problem_math"`
+	ScorePtAppliedMath float64 `json:"score_pt_applied_math"`
+}
+
+type MathScore struct {
+	Score
+	MathScorePerPart
 }

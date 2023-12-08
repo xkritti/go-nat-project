@@ -22,4 +22,5 @@ func SetupRoutes(app *fiber.App) {
 	upload_api.Post("/user-info/update", handler.UpdateUserExcel)
 
 	upload_api.Post("/score", handler.UploadScore)
+	upload_api.Post("/score/update", handler.UpdateScore)
 }

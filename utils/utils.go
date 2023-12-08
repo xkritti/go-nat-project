@@ -91,23 +91,29 @@ func DeleteFile(filename string) error {
 type ColumnLabelType string
 
 const (
-	ID           string = "id"
-	ExamType     string = "exam_type"
-	Name         string = "name"
-	Cid          string = "cid"
-	NewCid       string = "new_cid"
-	LevelRange   string = "level_range"
-	Level        string = "level"
-	Province     string = "province"
-	Region       string = "region"
-	School       string = "school"
-	ExamLocation string = "exam_location"
-	TotalScore   string = "total_score"
-
-	EngPtExpression string = "expression"
-	EngPtReading    string = "reading"
-	EngPtStructure  string = "structure"
-	EngPtVocabulary string = "vocabulary"
+	ID                string = "id"
+	ExamType          string = "exam_type"
+	Name              string = "name"
+	Cid               string = "cid"
+	NewCid            string = "new_cid"
+	LevelRange        string = "level_range"
+	Level             string = "level"
+	Province          string = "province"
+	Region            string = "region"
+	School            string = "school"
+	ExamLocation      string = "exam_location"
+	TotalScore        string = "total_score"
+	ProvinceRank      string = "province_rank"
+	RegionRank        string = "region_rank"
+	EngPtExpression   string = "score_pt_expression"
+	EngPtReading      string = "score_pt_reading"
+	EngPtStructure    string = "score_pt_structure"
+	EngPtVocabulary   string = "score_pt_vocabulary"
+	SciPtLesson       string = "score_pt_lesson_sci"
+	SciPtApplied      string = "score_pt_applied_sci"
+	MathPtCalculate   string = "score_pt_calculate_math"
+	MathPtProblemMath string = "score_pt_problem_math"
+	MathPtApplied     string = "score_pt_applied_math"
 )
 
 type ColumnReader struct {
@@ -171,6 +177,27 @@ func NewColumnReader(headerRow []string) *ColumnReader {
 		case EngPtVocabulary:
 			columns[EngPtVocabulary] = string(alphabet[i])
 			dbColumn = append(dbColumn, EngPtVocabulary)
+		case SciPtLesson:
+			columns[SciPtLesson] = string(alphabet[i])
+			dbColumn = append(dbColumn, SciPtLesson)
+		case SciPtApplied:
+			columns[SciPtApplied] = string(alphabet[i])
+			dbColumn = append(dbColumn, SciPtApplied)
+		case MathPtCalculate:
+			columns[MathPtCalculate] = string(alphabet[i])
+			dbColumn = append(dbColumn, MathPtCalculate)
+		case MathPtProblemMath:
+			columns[MathPtProblemMath] = string(alphabet[i])
+			dbColumn = append(dbColumn, MathPtProblemMath)
+		case MathPtApplied:
+			columns[MathPtApplied] = string(alphabet[i])
+			dbColumn = append(dbColumn, MathPtApplied)
+		case ProvinceRank:
+			columns[ProvinceRank] = string(alphabet[i])
+			dbColumn = append(dbColumn, ProvinceRank)
+		case RegionRank:
+			columns[RegionRank] = string(alphabet[i])
+			dbColumn = append(dbColumn, RegionRank)
 		}
 	}
 	fmt.Println(columns)
@@ -182,4 +209,19 @@ func NewColumnReader(headerRow []string) *ColumnReader {
 
 func (c *ColumnReader) GetColumnId(columnName string) string {
 	return c.Columns[columnName]
+}
+
+func GetShortLevelRange(levelRangeTH string) (string, error) {
+	switch levelRangeTH {
+	case "ประถมศึกษาตอนต้น":
+		return "LE", nil
+	case "ประถมศึกษาตอนปลาย":
+		return "UE", nil
+	case "มัธยมศึกษาตอนต้น":
+		return "LS", nil
+	case "มัธยมศึกษาตอนปลาย":
+		return "US", nil
+	default:
+		return "", errors.New("level range not found")
+	}
 }

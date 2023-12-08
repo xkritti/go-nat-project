@@ -198,7 +198,7 @@ func UpdateUserExcel(c *fiber.Ctx) error {
 
 		competitorList = append(competitorList, &models.Competitor{
 			Name:         name,
-			Cid:          utils.GetSha256Enc(cid),
+			Cid:          utils.GetSha256Enc(strings.TrimSpace(cid)),
 			ExamType:     examType,
 			LevelRange:   levelRange,
 			Level:        level,
