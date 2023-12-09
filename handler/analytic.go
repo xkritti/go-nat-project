@@ -33,34 +33,34 @@ var e3 string = "นักเรียนมีความรู้และค
 var e4 string = "นักเรียนมีความรู้และความเข้าใจเนื้อหาภาษาอังกฤษในขอบเขตช่วงชั้นที่กำลังศึกษาระดับดี นักเรียนรู้และเข้าใจคำศัพท์ รูปแบบประโยคบทสนทนา การโต้ตอบ หรือการจำลองสถานการณ์ที่มีการใช้สำนวน นักเรียนสามารถคิด วิเคราะห์ ตีความ และสรุปใจความบริบทของบทความที่มีความหมายโดยตรงและความหมายโดยนัยได้ในระดับดี นอกจากนี้ นักเรียนสามารถระบุประเภทและหน้าที่ของคำ โครงสร้างประโยค หลักไวยากรณ์ และองค์ประกอบของคำถามได้อย่างถูกต้อง และแม่นยำ ในขณะเดียวกัน นักเรียนมีทักษะในการระบุความสัมพันธ์ของโจทย์กับความรู้พื้นฐานได้อย่างสมเหตุสมผล รวมถึงสามารถนำความรู้เชิงทฤษฎีควบคู่กับประสบการณ์มาประยุกต์ใช้ในการทำข้อสอบได้ในระดับดี"
 var e5 string = "นักเรียนมีความรู้และความเข้าใจเนื้อหาภาษาอังกฤษในขอบเขตช่วงชั้นที่กำลังศึกษาระดับดีเยี่ยม นักเรียนรู้และเข้าใจคำศัพท์ รูปแบบประโยคบทสนทนา การโต้ตอบ หรือการจำลองสถานการณ์ที่มีการใช้สำนวน นักเรียนสามารถคิด วิเคราะห์ ตีความ และสรุปใจความบริบทของบทความที่มีความหมายโดยตรงและความหมายโดยนัยได้ในระดับดีเยี่ยม นอกจากนี้ นักเรียนสามารถระบุประเภทและหน้าที่ของคำ โครงสร้างประโยค หลักไวยากรณ์ และองค์ประกอบของคำถามได้อย่างคล่องแคล่ว ถูกต้อง และแม่นยำ ในขณะเดียวกัน นักเรียนสามารถระบุความสัมพันธ์ของโจทย์กับความรู้พื้นฐานได้อย่างสมเหตุสมผล รวมถึงสามารถนำความรู้เชิงทฤษฎีควบคู่กับประสบการณ์มาประยุกต์ใช้ในการทำข้อสอบและศาสตร์แขนงอื่นได้อย่างเชี่ยวชาญ"
 
-func prefixFilter(prefix string) (string, string) {
+func prefixFilter(prefix string, level int64) (string, string) {
 	if prefix == "M" {
-		return fmt.Sprintf("%s1", prefix), m1
+		return fmt.Sprintf("%s%d", prefix, level), m1
 	}
 	if prefix == "S" {
-		return fmt.Sprintf("%s1", prefix), s1
+		return fmt.Sprintf("%s%d", prefix, level), s1
 	}
 	if prefix == "E" {
-		return fmt.Sprintf("%s1", prefix), s2
+		return fmt.Sprintf("%s%d", prefix, level), s2
 	}
 	return "-", "-"
 }
 func getClassification(prefix string, score float64) (classification string, desc string) {
 
 	if score >= 0 && score <= 25.0 {
-		return prefixFilter(prefix)
+		return prefixFilter(prefix, 1)
 	}
 	if score >= 25.01 && score <= 49.99 {
-		return prefixFilter(prefix)
+		return prefixFilter(prefix, 2)
 	}
 	if score >= 50.00 && score <= 69.99 {
-		return prefixFilter(prefix)
+		return prefixFilter(prefix, 3)
 	}
 	if score >= 70.00 && score <= 84.99 {
-		return prefixFilter(prefix)
+		return prefixFilter(prefix, 4)
 	}
 	if score >= 85.00 && score <= 100.0 {
-		return prefixFilter(prefix)
+		return prefixFilter(prefix, 5)
 	}
 
 	return "-", "-"
