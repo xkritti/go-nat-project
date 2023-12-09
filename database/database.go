@@ -54,6 +54,9 @@ func Connect() {
 		&models.EngScore{},
 		&models.MathScore{},
 		&models.SciScore{},
+		&models.AvgScoreBySubject{},
+		&models.NumberOfCompetitorByProvince{},
+		&models.NumberOfCompetitorByRegion{},
 	}
 
 	db.AutoMigrate(models...)

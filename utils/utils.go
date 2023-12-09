@@ -115,6 +115,14 @@ const (
 	MathPtCalculate   string = "score_pt_calculate_math"
 	MathPtProblemMath string = "score_pt_problem_math"
 	MathPtApplied     string = "score_pt_applied_math"
+
+	MaxScore string = "max_score"
+	MinScore string = "min_score"
+	AvgScore string = "avg_score"
+
+	NumberOfCompetitor string = "number_of_competitor"
+	Year               string = "year"
+	Subject            string = "subject"
 )
 
 type ColumnReader struct {
@@ -199,6 +207,24 @@ func NewColumnReader(headerRow []string) *ColumnReader {
 		case RegionRank:
 			columns[RegionRank] = string(alphabet[i])
 			dbColumn = append(dbColumn, RegionRank)
+		case MaxScore:
+			columns[MaxScore] = string(alphabet[i])
+			dbColumn = append(dbColumn, MaxScore)
+		case MinScore:
+			columns[MinScore] = string(alphabet[i])
+			dbColumn = append(dbColumn, MinScore)
+		case AvgScore:
+			columns[AvgScore] = string(alphabet[i])
+			dbColumn = append(dbColumn, AvgScore)
+		case NumberOfCompetitor:
+			columns[NumberOfCompetitor] = string(alphabet[i])
+			dbColumn = append(dbColumn, NumberOfCompetitor)
+		case Year:
+			columns[Year] = string(alphabet[i])
+			dbColumn = append(dbColumn, Year)
+		case Subject:
+			columns[Subject] = string(alphabet[i])
+			dbColumn = append(dbColumn, Subject)
 		}
 	}
 	fmt.Println(columns)
