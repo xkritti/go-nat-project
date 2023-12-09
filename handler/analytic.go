@@ -278,6 +278,6 @@ func GetEngAnalytic(c *fiber.Ctx) error {
 		result.Parts.Vocabulary = "E5"
 	}
 
-	return nil
+	return utils.SendSuccess(c, result)
 
 }
