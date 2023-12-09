@@ -15,7 +15,6 @@ func SetupRoutes(app *fiber.App) {
 	user_api.Post("/auth", handler.GetUser)
 	// user_api.Get("/get_user", user_handler.GetUser)
 	// auth_api := api.Group("/auth")
-	// score_api := api.Group("/score")
 
 	upload_api := api.Group("/upload-data")
 	upload_api.Post("/user-info", handler.UploadUserExcel)
@@ -36,7 +35,7 @@ func SetupRoutes(app *fiber.App) {
 	upload_api.Post("/stat/number-of-competitor-by-province", handler.UploadNumberOfCompetitorByProvince)
 	upload_api.Post("/stat/number-of-competitor-by-region", handler.UploadNumberOfCompetitorByRegion)
 
-	userScoreApi := api.Group("/user_score")
-	userScoreApi.Get("", handler.GetScore)
+	score_api := api.Group("/score")
+	score_api.Get("", handler.GetScore)
 
 }
