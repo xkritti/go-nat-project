@@ -23,4 +23,13 @@ func SetupRoutes(app *fiber.App) {
 
 	upload_api.Post("/score", handler.UploadScore)
 	upload_api.Post("/score/update", handler.UpdateScore)
+
+	analytic_api := api.Group("/analytic")
+	analytic_api.Post("/get-math-iaar", handler.GetMathAnalytic)
+	analytic_api.Post("/get-sci-iaar", handler.GetSciAnalytic)
+	analytic_api.Post("/get-eng-iaar", handler.GetEngAnalytic)
+
+	globalScoreApi := api.Group("/global-score")
+	globalScoreApi.Get("", handler.GetGlobalProcessedScore)
+
 }

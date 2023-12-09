@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"
 )
@@ -235,4 +236,9 @@ func RemoveScientificNotationInString(s string) (string, error) {
 	nonScientificNotation := strconv.FormatFloat(floatingPointNum, 'f', -1, 64)
 
 	return nonScientificNotation, nil
+}
+
+func Validator() *validator.Validate {
+	validate := validator.New()
+	return validate
 }
