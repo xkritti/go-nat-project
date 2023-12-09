@@ -37,22 +37,22 @@ type EngPartAnalytic struct {
 }
 
 type GetMathAnalyticRequest struct {
-	ScorePercentage  float32 `json:"score_percentage" validated:"required , min=0 ,max=100"`
-	CalPartScore     float32 `json:"cal_part_score" validated:"required"`
-	ProblemPartScore float32 `json:"problem_part_score" validated:"required"`
-	AppliedPartScore float32 `json:"applied_part_score" validated:"required"`
+	ScorePercentage  float32 `json:"score_percentage" validate:"min=0.00,max=100.00"`
+	CalPartScore     float32 `json:"cal_part_score" validate:"min=0.00,max=22.6"`
+	ProblemPartScore float32 `json:"problem_part_score" validate:"min=0.00,max=56.65"`
+	AppliedPartScore float32 `json:"applied_part_score" validate:"min=0.00,max=24.75"`
 }
 
 type GetSciAnalyticRequest struct {
-	ScorePercentage  float32 `json:"score_percentage" validated:"required"`
-	LessonPartScore  float32 `json:"lesson_part_score" validated:"required"`
-	AppliedPartScore float32 `json:"applied_part_score" validated:"required"`
+	ScorePercentage  float32 `json:"score_percentage" validate:"min=0.00,max=100.00"`
+	LessonPartScore  float32 `json:"lesson_part_score" validate:"min=0.00,max=80.00"`
+	AppliedPartScore float32 `json:"applied_part_score" validate:"min=0.00,max=19.50"`
 }
 
 type GetEngAnalyticRequest struct {
-	ScorePercentage     float32 `json:"score_percentage" validated:"required"`
-	ExpressionPartScore float32 `json:"exp_part_score" validated:"required"`
-	ReadingPartScore    float32 `json:"read_part_score" validated:"required"`
-	StructPartScore     float32 `json:"struct_part_score" validated:"required"`
-	VocabularyPartScore float32 `json:"vocabulary_part_score"  validated:"required"`
+	ScorePercentage     float32 `json:"score_percentage" validate:"min=0.00,max=100.00"`
+	ExpressionPartScore float32 `json:"exp_part_score" validate:"min=0.00,max=16.00"`
+	ReadingPartScore    float32 `json:"read_part_score" validate:"min=0.00,max=36.00"`
+	StructPartScore     float32 `json:"struct_part_score" validate:"min=0.00,max=33.00"`
+	VocabularyPartScore float32 `json:"vocabulary_part_score"  validate:"min=0.00,max=35.00"`
 }

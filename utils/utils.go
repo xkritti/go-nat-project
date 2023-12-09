@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"
 )
@@ -224,4 +225,9 @@ func GetShortLevelRange(levelRangeTH string) (string, error) {
 	default:
 		return "", errors.New("level range not found")
 	}
+}
+
+func Validator() *validator.Validate {
+	validate := validator.New()
+	return validate
 }
