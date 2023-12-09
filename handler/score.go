@@ -609,6 +609,278 @@ func UpdateScore(c *fiber.Ctx) error {
 	})
 }
 
+func UploadAvgScoreBySubject(c *fiber.Ctx) error {
+
+	filename, err := utils.UploadFileReader(c)
+	if err != nil {
+		slog.Error("fail to upload file with error %v", err.Error())
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	defer utils.DeleteFile(filename)
+
+	sheetIndex, err := strconv.Atoi(c.FormValue("sheet_index"))
+	if err != nil {
+		slog.Error("fail to convert sheet index with error %v", err.Error())
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Fail to convert sheet index with %v", err.Error()),
+		})
+	}
+
+	excelResult, sheetName, _, err := utils.ExcelReader(filename, sheetIndex)
+	if err != nil {
+		slog.Error("fail to read excel file with error %v", err.Error())
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	db := database.DB.Db
+
+	errRowNumberList := []string{}
+	rows, err := excelResult.GetRows(sheetName)
+	if err != nil {
+		slog.Error("fail to get rows with error %v", err.Error())
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+	colReader := utils.NewColumnReader(rows[1])
+
+	avgScoreList := []*models.AvgScoreBySubject{}
+	for i := 3; i <= len(rows); i++ {
+
+		year, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Year), i))
+		levelRange, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.LevelRange), i))
+		subject, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Subject), i))
+
+		maxScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.MaxScore), i))
+		maxScore, err := strconv.ParseFloat(maxScoreStr, 64)
+		if err != nil {
+			slog.Error(err.Error())
+			maxScore = 0
+		}
+
+		minScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.MinScore), i))
+		minScore, err := strconv.ParseFloat(minScoreStr, 64)
+		if err != nil {
+			slog.Error(err.Error())
+			minScore = 0
+		}
+
+		avgScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.AvgScore), i))
+		avgScore, err := strconv.ParseFloat(avgScoreStr, 64)
+		if err != nil {
+			slog.Error(err.Error())
+			avgScore = 0
+		}
+
+		avgScoreList = append(avgScoreList, &models.AvgScoreBySubject{
+			Year:       year,
+			LevelRange: levelRange,
+			Subject:    subject,
+			MaxScore:   maxScore,
+			MinScore:   minScore,
+			AvgScore:   avgScore,
+		})
+	}
+
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(avgScoreList, 50)
+	if tx.Error != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Upload Failed with %v", tx.Error.Error()),
+		})
+	}
+
+	return c.JSON(models.CommonResponse{
+		Code: 1000,
+		Data: struct {
+			Message string
+			ErrList []string
+		}{
+			Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(avgScoreList), tx.RowsAffected),
+			ErrList: errRowNumberList,
+		},
+	})
+}
+
+func UploadNumberOfCompetitorByProvince(c *fiber.Ctx) error {
+
+	filename, err := utils.UploadFileReader(c)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	defer utils.DeleteFile(filename)
+
+	sheetIndex, err := strconv.Atoi(c.FormValue("sheet_index"))
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Fail to convert sheet index with %v", err.Error()),
+		})
+	}
+
+	excelResult, sheetName, _, err := utils.ExcelReader(filename, sheetIndex)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	db := database.DB.Db
+
+	errRowNumberList := []string{}
+	rows, err := excelResult.GetRows(sheetName)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+	colReader := utils.NewColumnReader(rows[1])
+
+	numOfCompetitorByProvinceList := []*models.NumberOfCompetitorByProvince{}
+	for i := 3; i <= len(rows); i++ {
+
+		year, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Year), i))
+		levelRange, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.LevelRange), i))
+		subject, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Subject), i))
+		province, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Province), i))
+
+		numOfCompetitorStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.NumberOfCompetitor), i))
+		numOfCompetitor, err := strconv.ParseInt(numOfCompetitorStr, 10, 64)
+		if err != nil {
+			slog.Error(err.Error())
+			errRowNumberList = append(errRowNumberList, fmt.Sprintf("%v, with error %v", i, err.Error()))
+			continue
+		}
+
+		numOfCompetitorByProvinceList = append(numOfCompetitorByProvinceList, &models.NumberOfCompetitorByProvince{
+			Year:               year,
+			LevelRange:         levelRange,
+			Subject:            subject,
+			Province:           province,
+			NumberOfCompetitor: numOfCompetitor,
+		})
+	}
+
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(numOfCompetitorByProvinceList, 50)
+	if tx.Error != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Upload Failed with %v", tx.Error.Error()),
+		})
+	}
+
+	return c.JSON(models.CommonResponse{
+		Code: 1000,
+		Data: struct {
+			Message string
+			ErrList []string
+		}{
+			Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(numOfCompetitorByProvinceList), tx.RowsAffected),
+			ErrList: errRowNumberList,
+		},
+	})
+}
+
+func UploadNumberOfCompetitorByRegion(c *fiber.Ctx) error {
+
+	filename, err := utils.UploadFileReader(c)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	defer utils.DeleteFile(filename)
+
+	sheetIndex, err := strconv.Atoi(c.FormValue("sheet_index"))
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Fail to convert sheet index with %v", err.Error()),
+		})
+	}
+
+	excelResult, sheetName, _, err := utils.ExcelReader(filename, sheetIndex)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+
+	db := database.DB.Db
+
+	errRowNumberList := []string{}
+	rows, err := excelResult.GetRows(sheetName)
+	if err != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Update Failed with %v", err.Error()),
+		})
+	}
+	colReader := utils.NewColumnReader(rows[1])
+
+	numOfCompetitorByProvinceList := []*models.NumberOfCompetitorByRegion{}
+	for i := 3; i <= len(rows); i++ {
+
+		year, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Year), i))
+		levelRange, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.LevelRange), i))
+		subject, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Subject), i))
+		region, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Region), i))
+
+		numOfCompetitorStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.NumberOfCompetitor), i))
+		numOfCompetitor, err := strconv.ParseInt(numOfCompetitorStr, 10, 64)
+		if err != nil {
+			slog.Error(err.Error())
+			errRowNumberList = append(errRowNumberList, fmt.Sprintf("%v, with error %v", i, err.Error()))
+			continue
+		}
+
+		numOfCompetitorByProvinceList = append(numOfCompetitorByProvinceList, &models.NumberOfCompetitorByRegion{
+			Year:               year,
+			LevelRange:         levelRange,
+			Subject:            subject,
+			Region:             region,
+			NumberOfCompetitor: numOfCompetitor,
+		})
+	}
+
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(numOfCompetitorByProvinceList, 50)
+	if tx.Error != nil {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: fmt.Sprintf("Upload Failed with %v", tx.Error.Error()),
+		})
+	}
+
+	return c.JSON(models.CommonResponse{
+		Code: 1000,
+		Data: struct {
+			Message string
+			ErrList []string
+		}{
+			Message: fmt.Sprintf("Upload Complete total row = %v, insert into db %v record", len(numOfCompetitorByProvinceList), tx.RowsAffected),
+			ErrList: errRowNumberList,
+		},
+	})
+}
+
 func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.ColumnReader, row int) (userScore *models.Score, rowNumberOfError int, err error) {
 
 	rowNumberOfError = row
@@ -619,11 +891,6 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 	province, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Province), row))
 	region, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.Region), row))
 	examLocation, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.ExamLocation), row))
-	totalScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.TotalScore), row))
-	totalScore, err := strconv.ParseFloat(totalScoreStr, 64)
-	if err != nil {
-		slog.Error(err.Error())
-	}
 
 	strCid, err := utils.RemoveScientificNotationInString(strings.TrimSpace(cid))
 	if err != nil {
@@ -634,18 +901,25 @@ func getUserInfo(excelResult *excelize.File, sheetName string, colReader *utils.
 		return nil, rowNumberOfError, fmt.Errorf("cid is empty")
 	}
 
+	totalScoreStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.TotalScore), row))
+	totalScore, err := strconv.ParseFloat(totalScoreStr, 64)
+	if err != nil {
+		slog.Error(err.Error())
+		return nil, rowNumberOfError, err
+	}
+
 	provinceRankStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.ProvinceRank), row))
 	provinceRank, err := strconv.Atoi(provinceRankStr)
 	if err != nil {
 		slog.Error(err.Error())
-		provinceRank = 0
+		return nil, rowNumberOfError, err
 	}
 
 	regionRankStr, _ := excelResult.GetCellValue(sheetName, fmt.Sprintf("%v%v", colReader.GetColumnId(utils.RegionRank), row))
 	regionRank, err := strconv.Atoi(regionRankStr)
 	if err != nil {
 		slog.Error(err.Error())
-		regionRank = 0
+		return nil, rowNumberOfError, err
 	}
 
 	shortLevelRange, err := utils.GetShortLevelRange(levelRange)

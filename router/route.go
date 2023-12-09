@@ -32,4 +32,7 @@ func SetupRoutes(app *fiber.App) {
 	globalScoreApi := api.Group("/global-score")
 	globalScoreApi.Get("", handler.GetGlobalProcessedScore)
 
+	upload_api.Post("/stat/avg-by-subject", handler.UploadAvgScoreBySubject)
+	upload_api.Post("/stat/number-of-competitor-by-province", handler.UploadNumberOfCompetitorByProvince)
+	upload_api.Post("/stat/number-of-competitor-by-region", handler.UploadNumberOfCompetitorByRegion)
 }
