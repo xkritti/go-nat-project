@@ -730,3 +730,88 @@ func getUserInfoForUpdate(excelResult *excelize.File, sheetName string, colReade
 
 	return userScore, 0, nil
 }
+
+func GetUserScore(c *fiber.Ctx) error {
+	db := database.DB.Db
+	competitor := &models.CompetitorWithScores{}
+
+	query := `
+SELECT ct.id ,ct.cid , ct.name , ct.exam_type , ct.level_range,
+
+es.province_rank as eng_province_rank,
+es.region_rank as eng_region_rank,
+
+es.total_score as eng_total_score, 
+es.score_pt_expression,
+es.score_pt_reading,
+es.score_pt_structure,
+es.score_pt_vocabulary,
+
+ss.province_rank as sci_province_rank,
+ss.region_rank as sci_region_rank,
+
+ss.total_score as sci_total_score, 
+ss.score_pt_lesson_sci,
+ss.score_pt_applied_sci,
+
+
+ms.province_rank as math_province_rank,
+ms.region_rank as math_region_rank,
+
+ms.total_score as math_total_score ,  
+ms.score_pt_calculate as score_pt_calculate_math,
+ms.score_pt_problem_math,
+ms.score_pt_applied_math
+
+FROM competitors ct
+LEFT JOIN eng_scores es ON ct.cid = es.hash_cid 
+LEFT JOIN sci_scores ss ON ct.cid = ss.hash_cid
+LEFT JOIN math_scores ms ON ct.cid = ms.hash_cid
+
+WHERE ct.cid = '5f034889cfbb51ea2b309a62273b6c9fe3ebe87c6be8a8f2e38de35cc67bc498'
+`
+	err := db.Raw(query).Scan(competitor).Error
+
+	if err != nil {
+		return c.SendStatus(500)
+	}
+
+	result := &models.UserScore{
+		CID:        competitor.CID,
+		Name:       competitor.Name,
+		ExamType:   competitor.ExamType,
+		LevelRange: competitor.LevelRange,
+		MathInfo: models.MathInfo{
+			MathTotalScore:   competitor.MathTotalScore,
+			MathProvinceRank: competitor.MathProvinceRank,
+			MathRegionRank:   competitor.MathRegionRank,
+			Parts: models.MathPart{
+				ScorePtCalculateMath: competitor.ScorePtCalculateMath,
+				ScorePtProblemMath:   competitor.ScorePtProblemMath,
+				ScorePtAppliedMath:   competitor.ScorePtAppliedMath,
+			},
+		},
+		SciInfo: models.SciInfo{
+			SciProvinceRank: competitor.SciProvinceRank,
+			SciTotalScore:   competitor.SciTotalScore,
+			SciRegionRank:   competitor.SciRegionRank,
+			Parts: models.SciPart{
+				ScorePtLessonSci:  competitor.ScorePtLessonSci,
+				ScorePtAppliedSci: competitor.ScorePtAppliedSci,
+			},
+		},
+		EngInfo: models.EngInfo{
+			EngProvinceRank: competitor.EngProvinceRank,
+			EngRegionRank:   competitor.EngRegionRank,
+			EngTotalScore:   competitor.EngTotalScore,
+			Parts: models.EngPart{
+				ScorePtExpression: competitor.ScorePtExpression,
+				ScorePtReading:    competitor.ScorePtReading,
+				ScorePtStructure:  competitor.ScorePtStructure,
+				ScorePtVocabulary: competitor.ScorePtVocabulary,
+			},
+		},
+	}
+
+	return utils.SendSuccess(c, result)
+}

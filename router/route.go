@@ -13,13 +13,14 @@ func SetupRoutes(app *fiber.App) {
 	})
 	user_api := api.Group("/user")
 	user_api.Post("/auth", handler.GetUser)
+	user_api.Get("/competitorWithScore", handler.GetUserScore)
 	// user_api.Get("/get_user", user_handler.GetUser)
 	// auth_api := api.Group("/auth")
 	// score_api := api.Group("/score")
 
 	upload_api := api.Group("/upload-data")
 	upload_api.Post("/user-info", handler.UploadUserExcel)
-	upload_api.Post("/user-info/update", handler.UpdateUserExcel)
+	upload_api.Post("/user-info/update", handler.UploadUserExcel)
 
 	upload_api.Post("/score", handler.UploadScore)
 	upload_api.Post("/score/update", handler.UpdateScore)
