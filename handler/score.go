@@ -15,7 +15,42 @@ import (
 )
 
 func GetScore(c *fiber.Ctx) error {
-	return nil
+	cid := c.Query("cid")
+	if cid == "" {
+		return c.JSON(models.CommonResponse{
+			Code: 1001,
+			Data: "cid is empty",
+		})
+	}
+
+	db := database.DB.Db
+	engScorePerUser := models.EngScorePerUser{}
+	sciScorePerUser := models.SciScorePerUser{}
+	mathScorePerUser := models.MathScorePerUser{}
+	subjects := models.Subjects{}
+
+	tx := db.Model(&models.EngScore{}).Where("hash_cid = ?", cid).First(&engScorePerUser)
+	if tx.Error != nil {
+		subjects.EngScorePerUser = nil
+	} else {
+		subjects.EngScorePerUser = &engScorePerUser
+	}
+
+	tx = db.Model(&models.SciScore{}).Where("hash_cid = ?", cid).First(&sciScorePerUser)
+	if tx.Error != nil {
+		subjects.SciScorePerUser = nil
+	} else {
+		subjects.SciScorePerUser = &sciScorePerUser
+	}
+
+	tx = db.Model(&models.MathScore{}).Where("hash_cid = ?", cid).First(&mathScorePerUser)
+	if tx.Error != nil {
+		subjects.MathScorePerUser = nil
+	} else {
+		subjects.MathScorePerUser = &mathScorePerUser
+	}
+
+	return utils.SendSuccess(c, &fiber.Map{"hasd_ci": cid, "subjects": subjects})
 }
 
 func UploadScore(c *fiber.Ctx) error {

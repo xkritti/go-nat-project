@@ -28,6 +28,13 @@ type EngScorePerPart struct {
 	ScorePtVocabulary float64 `json:"score_pt_vocabulary"`
 }
 
+type EngScorePerUser struct {
+	TotalScore      float64 `json:"score_percentage"`
+	ProvinceRank    int     `json:"province_rank"`
+	RegionRank      int     `json:"region_rank"`
+	EngScorePerPart `json:"parts"`
+}
+
 type EngScore struct {
 	Score
 	EngScorePerPart
@@ -36,6 +43,13 @@ type EngScore struct {
 type SciScorePerPart struct {
 	ScorePtLessonSci  float64 `json:"score_pt_lesson_sci"`
 	ScorePtAppliedSci float64 `json:"score_pt_applied_sci"`
+}
+
+type SciScorePerUser struct {
+	TotalScore      float64 `json:"score_percentage"`
+	ProvinceRank    int     `json:"province_rank"`
+	RegionRank      int     `json:"region_rank"`
+	SciScorePerPart `json:"parts"`
 }
 
 type SciScore struct {
@@ -49,7 +63,24 @@ type MathScorePerPart struct {
 	ScorePtAppliedMath float64 `json:"score_pt_applied_math"`
 }
 
+type MathScorePerUser struct {
+	TotalScore       float64 `json:"score_percentage"`
+	ProvinceRank     int     `json:"province_rank"`
+	RegionRank       int     `json:"region_rank"`
+	MathScorePerPart `json:"parts"`
+}
+
 type MathScore struct {
 	Score
 	MathScorePerPart
+}
+
+type UserScore struct {
+	Subjects `json:"subjects"`
+}
+
+type Subjects struct {
+	*EngScorePerUser  `json:"eng"`
+	*SciScorePerUser  `json:"sci"`
+	*MathScorePerUser `json:"math"`
 }

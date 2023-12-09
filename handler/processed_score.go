@@ -8,9 +8,7 @@ import (
 )
 
 func GetGlobalProcessedScore(c *fiber.Ctx) error {
-
 	globalScore := []models.GlobalScore{
-
 		{
 			Title:   "MATH",
 			TitleTh: "คณิตศาสตร์",
