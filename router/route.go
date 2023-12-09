@@ -29,4 +29,7 @@ func SetupRoutes(app *fiber.App) {
 	analytic_api.Get("/get-sci-iaar", handler.GetSciAnalytic)
 	analytic_api.Get("/get-eng-iaar", handler.GetEngAnalytic)
 
+	globalScoreApi := api.Group("/global-score")
+	globalScoreApi.Get("", handler.GetGlobalProcessedScore)
+
 }
