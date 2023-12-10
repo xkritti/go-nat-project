@@ -9,17 +9,44 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm/clause"
 )
 
+type getScoreRequest struct {
+	HashCid string `json:"hash_cid" validate:"required"`
+}
+
+type getScoreResponse struct {
+	HashCid  string          `json:"hash_cid"`
+	Subjects models.Subjects `json:"subjects"`
+}
+
 func GetScore(c *fiber.Ctx) error {
-	cid := c.Query("cid")
-	if cid == "" {
-		return c.JSON(models.CommonResponse{
-			Code: 1001,
-			Data: "cid is empty",
+
+	req := &getScoreRequest{}
+
+	err := c.QueryParser(req)
+	if err != nil {
+		return utils.SendCommonError(c, models.CommonError{
+			Code: 4000,
+			ErrorData: models.ApiError{
+				ErrorTitle:   "Failed to parse request",
+				ErrorMessage: err.Error(),
+			},
+		})
+	}
+
+	err = validator.New().Struct(req)
+	if err != nil {
+		return utils.SendCommonError(c, models.CommonError{
+			Code: 4000,
+			ErrorData: models.ApiError{
+				ErrorTitle:   "Invalid Request",
+				ErrorMessage: err.Error(),
+			},
 		})
 	}
 
@@ -29,28 +56,33 @@ func GetScore(c *fiber.Ctx) error {
 	mathScorePerUser := models.MathScorePerUser{}
 	subjects := models.Subjects{}
 
-	tx := db.Model(&models.EngScore{}).Where("hash_cid = ?", cid).First(&engScorePerUser)
+	tx := db.Model(&models.EngScore{}).Where("hash_cid = ?", req.HashCid).First(&engScorePerUser)
 	if tx.Error != nil {
 		subjects.EngScorePerUser = nil
 	} else {
 		subjects.EngScorePerUser = &engScorePerUser
 	}
 
-	tx = db.Model(&models.SciScore{}).Where("hash_cid = ?", cid).First(&sciScorePerUser)
+	tx = db.Model(&models.SciScore{}).Where("hash_cid = ?", req.HashCid).First(&sciScorePerUser)
 	if tx.Error != nil {
 		subjects.SciScorePerUser = nil
 	} else {
 		subjects.SciScorePerUser = &sciScorePerUser
 	}
 
-	tx = db.Model(&models.MathScore{}).Where("hash_cid = ?", cid).First(&mathScorePerUser)
+	tx = db.Model(&models.MathScore{}).Where("hash_cid = ?", req.HashCid).First(&mathScorePerUser)
 	if tx.Error != nil {
 		subjects.MathScorePerUser = nil
 	} else {
 		subjects.MathScorePerUser = &mathScorePerUser
 	}
 
-	return utils.SendSuccess(c, &fiber.Map{"hasd_ci": cid, "subjects": subjects})
+	resp := &getScoreResponse{
+		HashCid:  req.HashCid,
+		Subjects: subjects,
+	}
+
+	return utils.SendSuccess(c, resp)
 }
 
 func UploadScore(c *fiber.Ctx) error {

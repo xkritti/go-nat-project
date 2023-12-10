@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/xuri/excelize/v2"
@@ -38,22 +39,35 @@ func GetAllUser(c *fiber.Ctx) error {
 	}
 }
 
+type getUserRequest struct {
+	Cid string `json:"cid"`
+}
+
 func GetUser(c *fiber.Ctx) error {
 	db := database.DB.Db
 
-	payload := struct {
-		Cid string `json:"cid"`
-	}{}
+	req := &getUserRequest{}
 
-	err := c.BodyParser(&payload)
-
+	err := c.BodyParser(req)
 	if err != nil {
 		return err
 	}
 
-	result := models.Competitor{}
-	err = db.First(&result, "cid = ?", utils.GetSha256Enc(payload.Cid)).Error
+	err = validator.New().Struct(req)
+	if err != nil {
+		return utils.SendCommonError(c, models.CommonError{
+			Code: 2001,
+			ErrorData: models.ApiError{
+				ErrorTitle:   "ไม่สามารถดำเนินการได้",
+				ErrorMessage: "ไม่พบรายชื่อในระบบ",
+			},
+		})
+	}
 
+	result := models.Competitor{}
+	hashCid := utils.GetSha256Enc(req.Cid)
+
+	err = db.Where("cid = ?", hashCid).First(&result).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return utils.SendCommonError(c, models.CommonError{
@@ -66,6 +80,12 @@ func GetUser(c *fiber.Ctx) error {
 		} else {
 			return err
 		}
+	}
+
+	if slr, err := utils.GetShortLevelRange(result.LevelRange); err != nil {
+		result.ShortLevelRange = result.LevelRange
+	} else {
+		result.ShortLevelRange = slr
 	}
 
 	return utils.SendSuccess(c, result)
