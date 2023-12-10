@@ -56,3 +56,40 @@ type GetEngAnalyticRequest struct {
 	StructPartScore     float32 `json:"struct_part_score" validate:"min=0.00,max=33.00"`
 	VocabularyPartScore float32 `json:"vocabulary_part_score"  validate:"min=0.00,max=35.00"`
 }
+
+type Iaar struct {
+	Subject         string  `json:"subject"`
+	HashCid         string  `json:"-"`
+	Name            string  `json:"name"`
+	LevelRange      string  `json:"level_range"`
+	ShortLevelRange string  `json:"short_level_range"`
+	School          string  `json:"school"`
+	Province        string  `json:"province"`
+	Region          string  `json:"region"`
+	ExamType        string  `json:"exam_type"`
+	PrizeTypeTH     string  `json:"prize_type_th"`
+	PrizeTypeEN     string  `json:"prize_type_en"`
+	TotalScore      float64 `json:"total_score"`
+	RegionAvgScore  float64 `json:"region_avg_score"`
+	RegionMaxScore  float64 `json:"region_max_score"`
+	ProvinceRank    string  `json:"province_rank"`
+	RegionRank      string  `json:"region_rank"`
+}
+
+type EngIaar struct {
+	Iaar
+	EngScorePerPart
+	AnalyticData EngAnalytic `json:"analytic_data"`
+}
+
+type MathIaar struct {
+	Iaar
+	MathScorePerPart
+	AnalyticData MathAnalytic `json:"analytic_data"`
+}
+
+type SciIaar struct {
+	Iaar
+	SciScorePerPart
+	AnalyticData SciAnalytic `json:"analytic_data"`
+}

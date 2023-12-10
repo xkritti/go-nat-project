@@ -22,6 +22,7 @@ func SetupRoutes(app *fiber.App) {
 	analytic_api.Post("/get-math-iaar", handler.GetMathAnalytic)
 	analytic_api.Post("/get-sci-iaar", handler.GetSciAnalytic)
 	analytic_api.Post("/get-eng-iaar", handler.GetEngAnalytic)
+	analytic_api.Post("/get-iaar", handler.GetIaarData)
 
 	statApi := api.Group("/stat")
 	statApi.Get("/avg-score-by-level-range", handler.GetAvgScoreByLevelRange)
