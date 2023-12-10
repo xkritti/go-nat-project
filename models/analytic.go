@@ -7,9 +7,9 @@ type MathAnalytic struct {
 }
 
 type MathPartAnalytic struct {
-	Calculation     string `json:"calculation"`
-	ProblemSolution string `json:"problem_solution"`
-	Appliation      string `json:"appliation"`
+	MathCalculation     string `json:"math_calculation"`
+	MathProblemSolution string `json:"math_problem_solution"`
+	MathAppliation      string `json:"math_appliation"`
 }
 
 type SciAnalytic struct {
@@ -19,8 +19,8 @@ type SciAnalytic struct {
 }
 
 type SciPartAnalytic struct {
-	Lesson     string `json:"lesson"`
-	Appliation string `json:"appliation"`
+	SciLesson     string `json:"sci_lesson"`
+	SciAppliation string `json:"sci_appliation"`
 }
 
 type EngAnalytic struct {
@@ -30,10 +30,10 @@ type EngAnalytic struct {
 }
 
 type EngPartAnalytic struct {
-	Expression string `json:"expression"`
-	Reading    string `json:"reading"`
-	Structure  string `json:"structure"`
-	Vocabulary string `json:"vocabulary"`
+	EngExpression string `json:"eng_expression"`
+	EngReading    string `json:"eng_reading"`
+	EngStructure  string `json:"eng_structure"`
+	EngVocabulary string `json:"eng_vocabulary"`
 }
 
 type GetMathAnalyticRequest struct {
@@ -82,14 +82,38 @@ type EngIaar struct {
 	AnalyticData EngAnalytic `json:"analytic_data"`
 }
 
+type EngIaarResponse struct {
+	Iaar
+	ScorePtExpression float64     `json:"eng_score_pt_expression"`
+	ScorePtReading    float64     `json:"eng_score_pt_reading"`
+	ScorePtStructure  float64     `json:"eng_score_pt_structure"`
+	ScorePtVocabulary float64     `json:"eng_score_pt_vocabulary"`
+	AnalyticData      EngAnalytic `json:"analytic_data"`
+}
+
 type MathIaar struct {
 	Iaar
 	MathScorePerPart
 	AnalyticData MathAnalytic `json:"analytic_data"`
 }
 
+type MathIaarResponse struct {
+	Iaar
+	ScorePtCalculate   float64      `json:"math_score_pt_calculate"`
+	ScorePtProblemMath float64      `json:"math_score_pt_problem_math"`
+	ScorePtApplied     float64      `json:"math_score_pt_applied"`
+	AnalyticData       MathAnalytic `json:"analytic_data"`
+}
+
 type SciIaar struct {
 	Iaar
 	SciScorePerPart
 	AnalyticData SciAnalytic `json:"analytic_data"`
+}
+
+type SciIaarResponse struct {
+	Iaar
+	ScorePtLesson  float64     `json:"sci_score_pt_lesson"`
+	ScorePtApplied float64     `json:"sci_score_pt_applied"`
+	AnalyticData   SciAnalytic `json:"analytic_data"`
 }
